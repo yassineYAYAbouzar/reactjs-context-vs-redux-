@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { connect } from 'react-redux';
-import { getContacts ,deletContact ,addContact} from '../actions/contactAction';
-const Counter = ({getContacts,contact,deletContact ,addContact}) => {
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { addContact, deletContact, getContacts } from '../actions/contactAction';
+const Counter = () => {
    const initialValues = {
       id: 0,
       email: "",
@@ -9,10 +10,14 @@ const Counter = ({getContacts,contact,deletContact ,addContact}) => {
 
    const [values, setValues] = useState(initialValues)
    
+   const dispatch = useDispatch()
+   const contacts = useSelector((state) => state.mycontact.contacts)
    useEffect(()=>{
-      getContacts()
-      console.log(contact)
+      dispatch(getContacts())
+      console.log(contacts)
    },[])
+
+
     const handleInputChange = (e) =>{
       e.preventDefault()
       const { name, value } = e.target;
@@ -21,22 +26,23 @@ const Counter = ({getContacts,contact,deletContact ,addContact}) => {
         [name]: value,
       });
    }
+
    const onSubmit = (e) => {
       e.preventDefault()
+      dispatch(addContact(values))
       console.log(values)
-      addContact(values)
+      console.log(contacts)
+   }
+   const deleteItem = (id) =>{
+      console.log(id)
+      dispatch(deletContact(id))
    }
    return(
       <div>
-         <h3 >this is counter {contact.map(conta=>{
-            return( 
-               <div>
-                  <p key={conta.id}>{conta.email}</p>
-                  <button  onClick={() =>deletContact(conta.id)}>delet</button>
-               
-               </div>
-            )
-         })}</h3>
+        
+         {
+            contacts.map((item,i) => <li onClick={() =>deleteItem(i)} key={i}>{item.email}</li>)
+         }
                <form >
                      <input
                         value={values.id}
@@ -55,13 +61,7 @@ const Counter = ({getContacts,contact,deletContact ,addContact}) => {
       </div>
    )
 }
-const mapStateToProps = (state) =>{
-   return{
-      contact : state.mycontact.contacts
-   }
-}
 
 
 
-
-export default connect(mapStateToProps,{getContacts,deletContact,addContact})(Counter) ;
+export default Counter;
